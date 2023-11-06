@@ -7,14 +7,14 @@
 
 //=================================================================================//
 
-#define BUF_LEN 128
+#define BUF_LEN 3
 
 //=================================================================================//
 
 int main() {
   struct FirmwareData{
-	  int minor;
-	  int major;
+	  uint8_t minor;
+	  uint8_t major;
   };
   enum Request{
 	  FWRequest,
@@ -23,11 +23,6 @@ int main() {
   enum Response{
 	  FWResponse,
 	  SensorResponse,
-  };
-  struct context{
-	  Request req;
-	  Response res;
-	  char[8] data;
   };
   // Enable USB serial so we can print
   stdio_init_all();
@@ -45,19 +40,13 @@ int main() {
   gpio_set_function (PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI);
 
   // We need two buffers, one for the data to send, and one for the data to receive.
-  struct context ctx out_buf [BUF_LEN], in_buf [BUF_LEN];
-
-  // Initialize the buffers to 0.
-  for (u_int8_t i = 0; i < BUF_LEN; ++i) {
-    out_buf [i] = 0;
-    in_buf [i] = 0;
-  }
+  enum Request req = FWRequest;
+  u_int8_t out_buf [BUF_LEN]= {FWRequest, 0x00, 0x00}, in_buf [BUF_LEN]={0x00, 0x00, 0x00};
 
   for (uint8_t i = 0; ; ++i) {
     printf ("Sending data %d to SPI Peripheral\n", i);
-    out_buf [0] = i;
     // Write the output buffer to COPI, and at the same time read from CIPO to the input buffer.
-    spi_write_read_blocking (spi_default, out_buf, in_buf, 1);
+    spi_write_read_blocking (spi_default, out_buf, in_buf, 3);
 
     // Sleep for some seconds so you get a chance to read the output.
     sleep_ms (2 * 1000);

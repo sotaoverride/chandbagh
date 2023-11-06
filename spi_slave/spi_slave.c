@@ -29,7 +29,7 @@
 #include "pico/binary_info.h"
 #include "hardware/spi.h"
 
-#define BUF_LEN         0x100
+#define BUF_LEN        3 
 
 void printbuf(uint8_t buf[], size_t len) {
     int i;
@@ -58,8 +58,8 @@ int main() {
     printf("SPI slave example\n");
 
     struct FirmwareData{
-          int minor;
-          int major;
+          uint8_t minor;
+          int8_t major;
     };
     enum Request{
           FWRequest,
@@ -68,11 +68,6 @@ int main() {
     enum Response{
           FWResponse,
           SensorResponse,
-    };
-    struct context{
-          Request req;
-          Response res;
-          char[8] data;
     };
 
     // Enable SPI 0 at 1 MHz and connect to GPIOs
@@ -96,17 +91,31 @@ int main() {
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");
     printbuf(out_buf, BUF_LEN);
     struct FirmwareData fwData = {1,1};
+    bool sendData = 0;
+    //forego one transfer to assure devices are in sync
+    while(!gpio_get(PICO_DEFAULT_SPI_CSN_PIN)){}
+    while(gpio_get(PICO_DEFAULT_SPI_CSN_PIN)){} 
     
     for (size_t i = 0; ; ++i) {
-        spi_read_blocking(spi_default,out_buf,in_buf,BUF_LEN);
-	Request fwreq = FWRequest;
-	switch  (in_buff[0]){
-	    case fwreq: spi_write_blocking(spi_default,fwData, sizeof(FirmwareData));
+	//read one byte to figure out request type.
+        spi_read_blocking(spi_default,out_buf,in_buf,1);
+	switch  (in_buf[0]){
+	    //send back context which includes request type along with the data requested
+	    case 0x00: 
+				spi_write_blocking(spi_default, 0x01, 1);
+				sendData=1;
+				break;
+	    default:
+				//writing an int here 2 bytes? should just be writing a byte at 
+				//a time?!
+				if(sendData){
+				spi_write_blocking(spi_default,fwData.minor, 1);
+				spi_write_blocking(spi_default,fwData.major, 1);
+				sendData = 0;
+				}
+				break;
 	}
 
-	// Write the output buffer to MISO, and at the same time read from MOSI.
-	
-        spi_write_read_blocking(spi_default, out_buf, in_buf, BUF_LEN);
 
         // Write to stdio whatever came in on the MOSI line.
         printf("SPI slave says: read page %d from the MOSI line:\n", i);
