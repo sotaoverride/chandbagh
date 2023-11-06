@@ -24,22 +24,11 @@ int main() {
 	  FWResponse,
 	  SensorResponse,
   };
-  union TransferType{
+  struct context{
 	  Request req;
 	  Response res;
+	  char[8] data;
   };
-  union Data{
-	  FirmwareData fwData;
-	  SensorData sensorData;
-  };
-  struct context{
-	  union TransferType type;
-	  union Data data;
-  }
-
-
-
-  union TransferType
   // Enable USB serial so we can print
   stdio_init_all();
 
@@ -56,7 +45,7 @@ int main() {
   gpio_set_function (PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI);
 
   // We need two buffers, one for the data to send, and one for the data to receive.
-  uint8_t out_buf [BUF_LEN], in_buf [BUF_LEN];
+  struct context ctx out_buf [BUF_LEN], in_buf [BUF_LEN];
 
   // Initialize the buffers to 0.
   for (u_int8_t i = 0; i < BUF_LEN; ++i) {
