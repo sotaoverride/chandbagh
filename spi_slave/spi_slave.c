@@ -57,6 +57,24 @@ int main() {
 
     printf("SPI slave example\n");
 
+    struct FirmwareData{
+          int minor;
+          int major;
+    };
+    enum Request{
+          FWRequest,
+          SensorRequest,
+    };
+    enum Response{
+          FWResponse,
+          SensorResponse,
+    };
+    struct context{
+          Request req;
+          Response res;
+          char[8] data;
+    };
+
     // Enable SPI 0 at 1 MHz and connect to GPIOs
     spi_init(spi_default, 1000 * 1000);
     spi_set_slave(spi_default, true);
@@ -77,9 +95,17 @@ int main() {
 
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");
     printbuf(out_buf, BUF_LEN);
+    struct FirmwareData fwData = {1,1};
     
     for (size_t i = 0; ; ++i) {
-        // Write the output buffer to MISO, and at the same time read from MOSI.
+        spi_read_blocking(spi_default,out_buf,in_buf,BUF_LEN);
+	Request fwreq = FWRequest;
+	switch  (in_buff[0]){
+	    case fwreq: spi_write_blocking(spi_default,fwData, sizeof(FirmwareData));
+	}
+
+	// Write the output buffer to MISO, and at the same time read from MOSI.
+	
         spi_write_read_blocking(spi_default, out_buf, in_buf, BUF_LEN);
 
         // Write to stdio whatever came in on the MOSI line.
