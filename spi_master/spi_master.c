@@ -4,7 +4,8 @@
 #include "hardware/spi.h"
 #include "pico/binary_info.h"
 #include "pico/stdlib.h"
-
+#include "../spi.h"
+#include "../printbuf.h"
 //=================================================================================//
 
 #define BUF_LEN 3
@@ -12,18 +13,6 @@
 //=================================================================================//
 
 int main() {
-  struct FirmwareData{
-	  uint8_t minor;
-	  uint8_t major;
-  };
-  enum Request{
-	  FWRequest,
-	  SensorRequest,
-  };
-  enum Response{
-	  FWResponse,
-	  SensorResponse,
-  };
   // Enable USB serial so we can print
   stdio_init_all();
 
@@ -40,7 +29,6 @@ int main() {
   gpio_set_function (PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI);
 
   // We need two buffers, one for the data to send, and one for the data to receive.
-  enum Request req = FWRequest;
   u_int8_t out_buf [BUF_LEN]= {FWRequest, 0x00, 0x00}, in_buf [BUF_LEN]={0x00, 0x00, 0x00};
 
   for (uint8_t i = 0; ; ++i) {
@@ -50,6 +38,7 @@ int main() {
 
     // Sleep for some seconds so you get a chance to read the output.
     sleep_ms (2 * 1000);
+    printbuf(in_buf, BUF_LEN);
   }
 }
 

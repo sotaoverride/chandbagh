@@ -1,5 +1,6 @@
 add_executable(spi_slave_messaging
         spi_slave.c
+	../printbuf.c
         )
 
 # Pull in basic dependencies

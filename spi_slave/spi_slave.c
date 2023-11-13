@@ -28,24 +28,9 @@
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
 #include "hardware/spi.h"
-
+#include "../spi.h"
+#include "../printbuf.h"
 #define BUF_LEN        3 
-
-void printbuf(uint8_t buf[], size_t len) {
-    int i;
-    for (i = 0; i < len; ++i) {
-        if (i % 16 == 15)
-            printf("%02x\n", buf[i]);
-        else
-            printf("%02x ", buf[i]);
-    }
-
-    // append trailing newline if there isn't one
-    if (i % 16) {
-        putchar('\n');
-    }
-}
-
 
 int main() {
     // Enable UART so we can print
@@ -57,19 +42,6 @@ int main() {
 
     printf("SPI slave example\n");
 
-    struct FirmwareData{
-          uint8_t minor;
-          int8_t major;
-    };
-    enum Request{
-          FWRequest,
-          SensorRequest,
-    };
-    enum Response{
-          FWResponse,
-          SensorResponse,
-    };
-
     // Enable SPI 0 at 1 MHz and connect to GPIOs
     spi_init(spi_default, 1000 * 1000);
     spi_set_slave(spi_default, true);
@@ -79,40 +51,25 @@ int main() {
     gpio_set_function(PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI);
     // Make the SPI pins available to picotool
     bi_decl(bi_4pins_with_func(PICO_DEFAULT_SPI_RX_PIN, PICO_DEFAULT_SPI_TX_PIN, PICO_DEFAULT_SPI_SCK_PIN, PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI));
+    struct FirmwareData fwData = {1,1};
 
-    uint8_t out_buf[BUF_LEN], in_buf[BUF_LEN];
+    uint8_t out_buf[BUF_LEN] = {FWResponse, fwData.major, fwData.minor}, in_buf[BUF_LEN];
 
-    // Initialize output buffer
-    for (size_t i = 0; i < BUF_LEN; ++i) {
-        // bit-inverted from i. The values should be: {0xff, 0xfe, 0xfd...}
-        out_buf[i] = ~i;
-    }
 
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");
     printbuf(out_buf, BUF_LEN);
-    struct FirmwareData fwData = {1,1};
-    bool sendData = 0;
     //forego one transfer to assure devices are in sync
     while(!gpio_get(PICO_DEFAULT_SPI_CSN_PIN)){}
     while(gpio_get(PICO_DEFAULT_SPI_CSN_PIN)){} 
-    
     for (size_t i = 0; ; ++i) {
 	//read one byte to figure out request type.
-        spi_read_blocking(spi_default,out_buf,in_buf,1);
+        spi_read_blocking(spi_default,out_buf[0],in_buf, 1);
 	switch  (in_buf[0]){
 	    //send back context which includes request type along with the data requested
-	    case 0x00: 
-				spi_write_blocking(spi_default, 0x01, 1);
-				sendData=1;
+	    case FWRequest: 
+				spi_write_blocking(spi_default, out_buf+1, 2);
 				break;
 	    default:
-				//writing an int here 2 bytes? should just be writing a byte at 
-				//a time?!
-				if(sendData){
-				spi_write_blocking(spi_default,fwData.minor, 1);
-				spi_write_blocking(spi_default,fwData.major, 1);
-				sendData = 0;
-				}
 				break;
 	}
 

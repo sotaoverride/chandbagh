@@ -1,5 +1,6 @@
 add_executable(spi_master_messaging
         spi_master.c
+	../printbuf.c
         )
 
 # enable usb output, disable uart output
