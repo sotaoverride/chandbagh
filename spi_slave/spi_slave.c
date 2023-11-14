@@ -55,7 +55,7 @@ int main() {
     struct FirmwareData fwData = {1,1};
 
     //uint8_t out_buf[BUF_LEN] = {FWResponse, fwData.major, fwData.minor}, in_buf[BUF_LEN]={0xff};
-    uint8_t out_buf[BUF_LEN] = {0xAB, 0xCA, 0xAA}, in_buf[BUF_LEN]={0xff};
+    uint8_t out_buf[BUF_LEN] = {0xAB, 0xCA, 0xAF}, in_buf[BUF_LEN]={0xfA,0x4D,0x5C};
 
 
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");
