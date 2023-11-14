@@ -37,8 +37,9 @@ int main() {
     stdio_init_all();
 #if !defined(spi_default) || !defined(PICO_DEFAULT_SPI_SCK_PIN) || !defined(PICO_DEFAULT_SPI_TX_PIN) || !defined(PICO_DEFAULT_SPI_RX_PIN) || !defined(PICO_DEFAULT_SPI_CSN_PIN)
 #warning spi/spi_slave example requires a board with SPI pins
-    puts("Default SPI pins were not defined");
+    printf("Default SPI pins were not defined");
 #else
+    sleep_ms (2 * 1000);
 
     printf("SPI slave example\n");
 
@@ -53,7 +54,7 @@ int main() {
     bi_decl(bi_4pins_with_func(PICO_DEFAULT_SPI_RX_PIN, PICO_DEFAULT_SPI_TX_PIN, PICO_DEFAULT_SPI_SCK_PIN, PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI));
     struct FirmwareData fwData = {1,1};
 
-    uint8_t out_buf[BUF_LEN] = {FWResponse, fwData.major, fwData.minor}, in_buf[BUF_LEN];
+    uint8_t out_buf[BUF_LEN] = {FWResponse, fwData.major, fwData.minor}, in_buf[BUF_LEN]={0};
 
 
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");
