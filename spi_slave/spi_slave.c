@@ -54,7 +54,8 @@ int main() {
     bi_decl(bi_4pins_with_func(PICO_DEFAULT_SPI_RX_PIN, PICO_DEFAULT_SPI_TX_PIN, PICO_DEFAULT_SPI_SCK_PIN, PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI));
     struct FirmwareData fwData = {1,1};
 
-    uint8_t out_buf[BUF_LEN] = {FWResponse, fwData.major, fwData.minor}, in_buf[BUF_LEN]={0};
+    //uint8_t out_buf[BUF_LEN] = {FWResponse, fwData.major, fwData.minor}, in_buf[BUF_LEN]={0xff};
+    uint8_t out_buf[BUF_LEN] = {0xAB, 0xCA, 0xAA}, in_buf[BUF_LEN]={0xff};
 
 
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");

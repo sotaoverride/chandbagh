@@ -3,11 +3,11 @@
           uint8_t major;
     };
     enum Request{
-          FWRequest,
+          FWRequest = 0x5A,
           SensorRequest,
     };
     enum Response{
-          FWResponse,
+          FWResponse = 0xCA,
           SensorResponse,
     };
 

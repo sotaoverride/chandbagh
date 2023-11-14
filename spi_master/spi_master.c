@@ -29,7 +29,7 @@ int main() {
   gpio_set_function (PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI);
 
   // We need two buffers, one for the data to send, and one for the data to receive.
-  u_int8_t out_buf [BUF_LEN]= {FWRequest, 0x00, 0x00}, in_buf [BUF_LEN]={0x00, 0x00, 0x00};
+  u_int8_t out_buf [BUF_LEN]= {FWRequest, 0xAA, 0xAA}, in_buf [BUF_LEN]={0x00, 0x00, 0x00};
 
   for (uint8_t i = 0; ; ++i) {
     printf ("Sending data %d to SPI Peripheral\n", i);
