@@ -37,7 +37,7 @@ int main() {
     spi_write_read_blocking (spi_default, out_buf, in_buf, 3);
 
     // Sleep for some seconds so you get a chance to read the output.
-    sleep_ms (2 * 1000);
+    //sleep_ms (2 * 1000);
     printbuf(in_buf, BUF_LEN);
   }
 }

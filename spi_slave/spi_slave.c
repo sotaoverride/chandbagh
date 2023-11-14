@@ -65,6 +65,7 @@ int main() {
     while(gpio_get(PICO_DEFAULT_SPI_CSN_PIN)){} 
     for (size_t i = 0; ; ++i) {
 	//read one byte to figure out request type.
+	   /*
         spi_read_blocking(spi_default,out_buf[0],in_buf, 1);
 	switch  (in_buf[0]){
 	    //send back context which includes request type along with the data requested
@@ -75,6 +76,8 @@ int main() {
 				break;
 	}
 
+        */
+	    spi_write_read_blocking (spi_default, out_buf, in_buf, 3);
 
         // Write to stdio whatever came in on the MOSI line.
         printf("SPI slave says: read page %d from the MOSI line:\n", i);
