@@ -3,6 +3,10 @@ add_executable(spi_slave_messaging
 	../printbuf.c
         )
 
+# enable usb output, disable uart output
+pico_enable_stdio_usb(spi_master_messaging 1)
+pico_enable_stdio_uart(spi_master_messaging 0)
+
 # Pull in basic dependencies
 target_link_libraries(spi_slave_messaging pico_stdlib hardware_spi)
 
