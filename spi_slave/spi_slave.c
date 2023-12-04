@@ -50,6 +50,8 @@ int main() {
     gpio_set_function(PICO_DEFAULT_SPI_SCK_PIN, GPIO_FUNC_SPI);
     gpio_set_function(PICO_DEFAULT_SPI_TX_PIN, GPIO_FUNC_SPI);
     gpio_set_function(PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI);
+    gpio_init(22);			// use GPIO 22 ( pin 29 )
+    gpio_set_dir(22,false);	// input
     // Make the SPI pins available to picotool
     bi_decl(bi_4pins_with_func(PICO_DEFAULT_SPI_RX_PIN, PICO_DEFAULT_SPI_TX_PIN, PICO_DEFAULT_SPI_SCK_PIN, PICO_DEFAULT_SPI_CSN_PIN, GPIO_FUNC_SPI));
     struct FirmwareData fwData = {1,1};
@@ -61,8 +63,8 @@ int main() {
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");
     printbuf(out_buf, BUF_LEN);
     //forego one transfer to assure devices are in sync
-    while(!gpio_get(PICO_DEFAULT_SPI_CSN_PIN)){}
-    while(gpio_get(PICO_DEFAULT_SPI_CSN_PIN)){} 
+    while(!gpio_get(22)){}
+    while(gpio_get(22)){} 
     for (size_t i = 0; ; ++i) {
 	//read one byte to figure out request type.
 	   /*
