@@ -1,28 +1,3 @@
-// Copyright (c) 2021 Michael Stoops. All rights reserved.
-// Portions copyright (c) 2021 Raspberry Pi (Trading) Ltd.
-// 
-// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the 
-// following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
-//    disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
-//    following disclaimer in the documentation and/or other materials provided with the distribution.
-// 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
-//    products derived from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-// INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE 
-// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// SPDX-License-Identifier: BSD-3-Clause
-//
-// Example of an SPI bus slave using the PL022 SPI interface
-
 #include <stdio.h>
 #include <string.h>
 #include "pico/stdlib.h"
@@ -66,21 +41,7 @@ int main() {
     while(!gpio_get(22)){}
     while(gpio_get(22)){} 
     for (size_t i = 0; ; ++i) {
-	//read one byte to figure out request type.
-	   /*
-        spi_read_blocking(spi_default,out_buf[0],in_buf, 1);
-	switch  (in_buf[0]){
-	    //send back context which includes request type along with the data requested
-	    case FWRequest: 
-				spi_write_blocking(spi_default, out_buf+1, 2);
-				break;
-	    default:
-				break;
-	}
-
-        */
-	    spi_write_read_blocking (spi_default, out_buf, in_buf, 3);
-
+	spi_write_read_blocking (spi_default, out_buf, in_buf, 3);
         // Write to stdio whatever came in on the MOSI line.
         printf("SPI slave says: read page %d from the MOSI line:\n", i);
         printbuf(in_buf, BUF_LEN);
