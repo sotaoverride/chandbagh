@@ -19,8 +19,8 @@ int main() {
   sleep_ms (2 * 1000);
   printf ("SPI Central Example\n");
 
-  // Enable SPI0 at 1 MHz
-  spi_init (spi_default, 1 * 1000000);
+  // Enable SPI0 at 1 KHz
+  spi_init (spi_default, 1 * 1000);
 
   // Assign SPI functions to the default SPI pins
   gpio_set_function (PICO_DEFAULT_SPI_RX_PIN, GPIO_FUNC_SPI);
