@@ -38,9 +38,9 @@ int main() {
     // Write the output buffer to COPI, and at the same time read from CIPO to the input buffer.
     gpio_put(22,false); 	// low, select slave
     spi_write_read_blocking (spi_default, out_buf, in_buf, 3);
+    sleep_ms (1 * 1000);
     gpio_put(22,true);
     // Sleep for some seconds so you get a chance to read the output.
-    //sleep_ms (2 * 1000);
     printbuf(in_buf, BUF_LEN);
   }
 }
