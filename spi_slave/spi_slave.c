@@ -41,13 +41,11 @@ int main() {
     while(!gpio_get(22)){}
     while(gpio_get(22)){} 
     for (size_t i = 0; ; ++i) {
-	//if (in_buf[0] == FWRequest){// spi_write_read_blocking (spi_default, fw_resp, in_buf, 3);}
-	spi_write_read_blocking (spi_default, out_buf, in_buf, 3);
-	/*
+	spi_write_read_blocking (spi_default, fw_resp, in_buf[0], 1);
 	if (in_buf[0] == FWRequest){
-		spi_write_read_blocking (spi_default, fw_resp, in_buf+1, 2);
+		spi_write_read_blocking (spi_default, FWResponse, in_buf, 1);
 	}
-	*/
+	spi_write_read_blocking (spi_default, fw_resp, in_buf+1, 2);
         // Write to stdio whatever came in on the MOSI line.
         printf("SPI slave says: read page %d from the MOSI line:\n", i);
         printbuf(in_buf, BUF_LEN);
