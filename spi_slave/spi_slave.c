@@ -38,11 +38,11 @@ int main() {
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");
     printbuf(out_buf, BUF_LEN);
     //forego one transfer to assure devices are in sync
+    while(!gpio_get(22)){}
+    while(gpio_get(22)){} 
     for (size_t i = 0; ; ++i) {
-    	while(gpio_get(22)){}
-    	while(!gpio_get(22)){} 
 	//if (in_buf[0] == FWRequest){// spi_write_read_blocking (spi_default, fw_resp, in_buf, 3);}
-	spi_write_read_blocking (spi_default, out_buf, in_buf, 1);
+	spi_write_read_blocking (spi_default, out_buf, in_buf, 3);
 	/*
 	if (in_buf[0] == FWRequest){
 		spi_write_read_blocking (spi_default, fw_resp, in_buf+1, 2);
