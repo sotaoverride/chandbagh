@@ -32,7 +32,7 @@ int main() {
     struct FirmwareData fwData = {1,1};
 
     //uint8_t out_buf[BUF_LEN] = {FWResponse, fwData.major, fwData.minor}, in_buf[BUF_LEN]={0xff};
-    uint8_t out_buf[BUF_LEN] = {0xAB, 0xCA, 0xAF}, in_buf[BUF_LEN]={0xBB,0x4D,0x5C}, fw_resp[BUF_LEN-1]={ 0xD5, 0xD5};
+    uint8_t out_buf[BUF_LEN] = {0xAB, 0xCA, 0xAF}, in_buf[BUF_LEN]={0xBB,0x4D,0x5C}, fw_resp[BUF_LEN]={ FWResponse, 0xD5, 0xD5};
 
 
     printf("SPI slave says: When reading from MOSI, the following buffer will be written to MISO:\n");
@@ -41,9 +41,9 @@ int main() {
     while(!gpio_get(22)){}
     while(gpio_get(22)){} 
     for (size_t i = 0; ; ++i) {
-	spi_write_read_blocking (spi_default, fw_resp, in_buf[0], 1);
+	spi_write_read_blocking (spi_default, fw_resp, in_buf, 1);
 	if (in_buf[0] == FWRequest){
-		spi_write_read_blocking (spi_default, FWResponse, in_buf, 1);
+		spi_write_read_blocking (spi_default, fw_resp, in_buf, 1);
 	}
 	spi_write_read_blocking (spi_default, fw_resp, in_buf+1, 2);
         // Write to stdio whatever came in on the MOSI line.
