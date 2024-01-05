@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-
+import <iostream>;
 int main(void);
 
 
@@ -45,14 +45,20 @@ static master_read_write(void *pfd) {
 	master_sockpair_read(pfd, 1, 0);
 	master_sockpair_write(pfd, 2, 1);
 	master_sockpair_read(pfd, 2, 1);
-	printf("0x%x", buff_master_rx[0]);
+	//should read 0xd5 0xd5
+	printf("0x%x", buff_master_rx[1]);
+	printf("0x%x", buff_master_rx[2]);
 }
 static slave_read_write(void *pfd) {
 	slave_sockpair_write(pfd, 1, 0);
 	slave_sockpair_read(pfd,1,0);
+	//should read 0xca
+	printf("0x%x", buff_slave_rx[0]);
 	slave_sockpair_write(pfd, 2, 1);
 	slave_sockpair_read(pfd, 2,1);
-	printf("0x%x", buff_slave_rx[0]);
+	//should read 0xad 0xfc
+	printf("0x%x", buff_slave_rx[1]);
+	printf("0x%x", buff_slave_rx[2]);
 }
 static void _spi_messaging_test() {
 	int fd[2];
