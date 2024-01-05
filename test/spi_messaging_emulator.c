@@ -35,26 +35,25 @@ static void * slave_sockpair_write(void *pfd, int bytes, int start) {
 
 static void * master_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	write(fd, buff_master_tx + start, bytes);
+	write(fd, buff_slave_tx + start, bytes);
 	return NULL;
 }
-static request_fw(void *pfd) {
+static master_read_write(void *pfd) {
 	master_sockpair_write(pfd, 1, 0);
-	master_sockpair_read(pfd,1,0);
-	printf("0x%x", buff_master_rx[0]);
+	master_sockpair_read(pfd, 1, 0);
 	master_sockpair_write(pfd, 2, 1);
 	master_sockpair_read(pfd, 2, 1);
-	printf("0x%x", buff_master_rx[1]);
+	printf("0x%x", buff_master_rx[0]);
 }
-static response_fw(void *pfd) {
+static slave_read_write(void *pfd) {
 	slave_sockpair_write(pfd, 1, 0);
 	slave_sockpair_read(pfd,1,0);
+	slave_sockpair_write(pfd, 2, 1);
+	slave_sockpair_read(pfd, 2,1);
 	printf("0x%x", buff_slave_rx[0]);
-	slave_sockpair_write(pfd,2,1);
-	slave_sockpair_read(pfd, 2, 1);
-	printf("0x%x", buff_slave_rx[1]);
 }
 static void _spi_messaging_test() {
+	while(1){
 	int fd[2];
 	pthread_t master_thr;
 	pthread_t slave_thr;
@@ -62,12 +61,13 @@ static void _spi_messaging_test() {
 	printf("socketpair msg passing for messages\n");
 
 	socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
-	pthread_create(&master_thr, NULL, request_fw, (void *)(&(fd[0])));
-	pthread_create(&slave_thr, NULL, response_fw, (void *)(&(fd[1])));
+	pthread_create(&master_thr, NULL, master_read_write, (void *)(&(fd[1])));
+	pthread_create(&slave_thr, NULL, slave_read_write, (void *)(&(fd[0])));
 	pthread_join(master_thr, NULL);
 	pthread_join(slave_thr, NULL);
 	close(fd[0]);
 	close(fd[1]);
+	}
 }
 
 int main(void){
