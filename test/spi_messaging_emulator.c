@@ -23,14 +23,12 @@ static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 
 static void * master_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	while(gpio22){}
 	read(fd, buff_master_rx + start, bytes);
 	return NULL;
 }
 
 static void * slave_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	while (!gpio22) {}
 	write(fd, buff_slave_tx + start, bytes);
 	return NULL;
 }
@@ -54,6 +52,7 @@ static void * master_read_write(void *pfd) {
 	return NULL;
 }
 static void * slave_read_write(void *pfd) {
+	while(!gpio22){}
 	slave_sockpair_write(pfd, 1, 0);
 	slave_sockpair_read(pfd,1,0);
 	//should read 0xca
@@ -70,15 +69,11 @@ static void _spi_messaging_test() {
 	pthread_t master_thr;
 	pthread_t slave_thr;
 	socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
+	pthread_create(&master_thr, NULL, master_read_write, (void *)(&(fd[1])));
+	pthread_create(&slave_thr, NULL, slave_read_write, (void *)(&(fd[0])));
 
 	while (1){
 	printf("socketpair msg passing for messages\n");
-	pthread_create(&master_thr, NULL, master_read_write, (void *)(&(fd[1])));
-	pthread_create(&slave_thr, NULL, slave_read_write, (void *)(&(fd[0])));
-	pthread_join(master_thr, NULL);
-	pthread_join(slave_thr, NULL);
-	close(fd[0]);
-	close(fd[1]);
 	}
 }
 
