@@ -17,38 +17,27 @@ static char buff_master_tx[3];
 
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	long index;
-	for (index=0; index < bytes; index++) {
-		read(fd, buff_slave_rx[index+start], 1);
-	}
+	read(fd, buff_slave_rx[index+start], bytes);
 	return NULL;
 }
 
 static void * master_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	long index;
-	for (index =0; index < bytes; index++){
-
-		read(fd, buff_master_rx[index+start], 1);
-	}
+	read(fd, buff_master_rx[index+start], bytes);
 	return NULL;
 }
 
 static void * slave_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	long index;
-	for (index=0; index < bytes; index++) {
-		write(fd, buff_slave_tx[index+1], 1);
-	}
+	write(fd, buff_slave_tx[index+start], bytes);
 	return NULL;
 }
 
 static void * master_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	long index;
-	for (index=0; index < bytes; index++) {
-		write(fd, buff_master_tx[index+start], 1);
-	}
+	write(fd, buff_master_tx[index+start], bytes);
 	return NULL;
 }
 static request_fw(void *pfd) {
