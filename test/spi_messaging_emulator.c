@@ -44,7 +44,7 @@ static request_fw(void *pfd) {
 	printf("0x%x", buff_master_rx[0]);
 	master_sockpair_write(pfd, 2, 1);
 	master_sockpair_read(pfd, 2, 1);
-	printf("0x%x", buff_master_tx[0]);
+	printf("0x%x", buff_master_rx[1]);
 }
 static response_fw(void *pfd) {
 	slave_sockpair_write(pfd, 1, 0);
@@ -52,7 +52,7 @@ static response_fw(void *pfd) {
 	printf("0x%x", buff_slave_rx[0]);
 	slave_sockpair_write(pfd,2,1);
 	slave_sockpair_read(pfd, 2, 1);
-	printf("0x%x", buff_slave_tx[0]);
+	printf("0x%x", buff_slave_rx[1]);
 }
 static void _spi_messaging_test() {
 	int fd[2];
@@ -64,6 +64,8 @@ static void _spi_messaging_test() {
 	socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	pthread_create(&master_thr, NULL, request_fw, (void *)(&(fd[0])));
 	pthread_create(&slave_thr, NULL, response_fw, (void *)(&(fd[1])));
+	pthread_join(master_thr, NULL);
+	pthread_join(slave_thr, NULL);
 	close(fd[0]);
 	close(fd[1]);
 }
