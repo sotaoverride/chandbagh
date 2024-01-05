@@ -51,7 +51,7 @@ static request_fw(void *pfd) {
 	master_sockpair_write(pfd, 1, 0);
 	master_sockpair_read(pfd,1,0);
 	master_sockpair_write(pfd, 2, 1);
-	master_sockpair_read(pfd, 2, 1)
+	master_sockpair_read(pfd, 2, 1);
 }
 static response_fw(void *pfd) {
 	slave_sockpair_write(pfd, 1, 0);
@@ -59,6 +59,7 @@ static response_fw(void *pfd) {
 	slave_sockpair_write(pfd,2,1);
 	slave_sockpair_read(pfd, 2, 1);
 	
+}
 static void _spi_messaging_test() {
 	int fd[2];
 	pthread_t master_thr;
