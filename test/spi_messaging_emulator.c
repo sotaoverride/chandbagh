@@ -23,6 +23,7 @@ static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 
 static void * master_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
+	while(gpio22){}
 	read(fd, buff_master_rx + start, bytes);
 	return NULL;
 }
@@ -44,6 +45,7 @@ static void * master_sockpair_write(void *pfd, int bytes, int start) {
 static void * master_read_write(void *pfd) {
 	master_sockpair_write(pfd, 1, 0);
 	master_sockpair_read(pfd, 1, 0);
+	printf("0x%x", buff_master_rx[0]);
 	master_sockpair_write(pfd, 2, 1);
 	master_sockpair_read(pfd, 2, 1);
 	//should read 0xd5 0xd5
