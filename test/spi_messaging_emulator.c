@@ -5,6 +5,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+
+int main(void);
+
+
 static char buff_slave_rx[3];
 static char buff_slave_tx[3];
 static char buff_master_rx[3];
@@ -72,4 +76,9 @@ static void _spi_messaging_test() {
 	pthread_create(&slave_thr, NULL, response_fw, (void *)(&(fd[1])));
 	close(fd[0]);
 	close(fd[1]);
+}
+
+int main(void){
+	_spi_messaging_test();
+	return 0;
 }
