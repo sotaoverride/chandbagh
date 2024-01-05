@@ -13,7 +13,7 @@ static char buff_slave_rx[3] = {0xaa, 0xbb, 0xbb};
 static char buff_slave_tx[3] = {0xca, 0xd5, 0xd5};
 static char buff_master_rx[3] =  {0xdd, 0xee, 0xcc};
 static char buff_master_tx[3] = {0x5a, 0xad, 0xfc};
-
+static bool gpio22 = false;
 
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
@@ -29,7 +29,9 @@ static void * master_sockpair_read(void *pfd, int bytes, int start) {
 
 static void * slave_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
+	gpio22 = false;
 	write(fd, buff_slave_tx + start, bytes);
+	gpio22 = true;
 	return NULL;
 }
 
@@ -53,13 +55,14 @@ static slave_read_write(void *pfd) {
 	printf("0x%x", buff_slave_rx[0]);
 }
 static void _spi_messaging_test() {
-	while(1){
 	int fd[2];
 	pthread_t master_thr;
 	pthread_t slave_thr;
 
+	while (1){
 	printf("socketpair msg passing for messages\n");
-
+	while(!gpio22){}
+	while(gpio22){}
 	socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 	pthread_create(&master_thr, NULL, master_read_write, (void *)(&(fd[1])));
 	pthread_create(&slave_thr, NULL, slave_read_write, (void *)(&(fd[0])));
