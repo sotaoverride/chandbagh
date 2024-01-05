@@ -49,7 +49,7 @@ static void * master_read_write(void *pfd) {
 	master_sockpair_read(pfd, 2, 1);
 	//should read 0xd5 0xd5
 	printf("0x%x", buff_master_rx[1]);
-	printf("0x%x", buff_master_rx[2]);
+	printf("0x%x \n", buff_master_rx[2]);
 	}
 	return NULL;
 }
@@ -64,7 +64,7 @@ static void * slave_read_write(void *pfd) {
 	slave_sockpair_read(pfd, 2,1);
 	//should read 0xad 0xfc
 	printf("0x%x", buff_slave_rx[1]);
-	printf("0x%x", buff_slave_rx[2]);
+	printf("0x%x \n", buff_slave_rx[2]);
 	}
 	return NULL;
 }
