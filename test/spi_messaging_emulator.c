@@ -9,10 +9,10 @@
 int main(void);
 
 
-static char buff_slave_rx[3];
-static char buff_slave_tx[3];
+static char buff_slave_rx[3] = {};
+static char buff_slave_tx[3] = {0xca, 0xd5, 0xd5};
 static char buff_master_rx[3];
-static char buff_master_tx[3];
+static char buff_master_tx[3] = {0x5a, 0xad, 0xfc};
 
 
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
