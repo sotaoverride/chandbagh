@@ -13,7 +13,7 @@ static unsigned char buff_slave_rx[3] = {0xaa, 0xbb, 0xbb};
 static unsigned char buff_slave_tx[3] = {0xca, 0xd5, 0xd5};
 static unsigned char buff_master_rx[3] =  {0xdd, 0xee, 0xcc};
 static unsigned char buff_master_tx[3] = {0x5a, 0xad, 0xfc};
-volatile static bool gpio22 = true;
+volatile static bool gpio22 = false;
 
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
@@ -40,9 +40,10 @@ static void * master_sockpair_write(void *pfd, int bytes, int start) {
 }
 static void * master_read_write(void *pfd) {
 	while(1){
-	gpio22 =false;
+	gpio22 =true;
 	master_sockpair_write(pfd, 1, 0);
 	master_sockpair_read(pfd, 1, 0);
+	gpio22 =false;
 	printf("0x%x", buff_master_rx[0]);
 	master_sockpair_write(pfd, 2, 1);
 	master_sockpair_read(pfd, 2, 1);
@@ -55,8 +56,8 @@ static void * master_read_write(void *pfd) {
 }
 static void * slave_read_write(void *pfd) {
 	while(1){
+	while(gpio22){slave_sockpair_write(pfd, 1, 0);}
 	while(!gpio22){}
-	while(gpio22){}
 	
 	slave_sockpair_write(pfd, 1, 0);
 	slave_sockpair_read(pfd,1,0);
