@@ -19,28 +19,28 @@ volatile static bool gpio22 = false;
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = read(fd, buff_slave_rx + start, bytes);
-	if (rc == -1) if perror("read failed ");
+	if (rc == -1)  perror("read failed ");
 	return NULL;
 }
 
 static void * master_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = read(fd, buff_slave_rx + start, bytes);
-	if (rc == -1) if perror("read failed ");
+	if (rc == -1)  perror("read failed ");
 	return NULL;
 }
 
 static void * slave_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = write(fd, buff_slave_tx + start, bytes);
-	if (rc == -1) if perror("write failed ");
+	if (rc == -1)  perror("write failed ");
 	return NULL;
 }
 
 static void * master_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = write(fd, buff_slave_tx + start, bytes);
-	if (rc == -1) if perror("write failed ");
+	if (rc == -1)  perror("write failed ");
 	return NULL;
 }
 static void * master_read_write(void *pfd) {
