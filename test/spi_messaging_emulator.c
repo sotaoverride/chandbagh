@@ -18,7 +18,8 @@ volatile static bool gpio22 = false;
 
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	int rc = read(fd, buff_slave_rx + start, bytes);
+	int rc;
+       	rc = read(fd, buff_slave_rx + start, bytes);
 	if (rc == -1)  perror("read failed ");
 	return NULL;
 }
@@ -86,6 +87,7 @@ static void _spi_messaging_test() {
 	pthread_t slave_thr;
 	socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, 0, fd);
 	pthread_create(&master_thr, NULL, master_read_write, (void *)(&(fd[1])));
+	fcntl(fd[0], F_SETFL, saved_flags & ~O_NONBLOCK);
 	pthread_create(&slave_thr, NULL, slave_read_write, (void *)(&(fd[0])));
 	pthread_join(master_thr, NULL);
 	pthread_join(slave_thr, NULL);
