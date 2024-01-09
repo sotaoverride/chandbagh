@@ -19,28 +19,28 @@ volatile static bool gpio22 = false;
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = read(fd, buff_slave_rx + start, bytes);
-	if (rc == EAGAIN || rc == EWOULDBLOCK) printf("read failed %d \n", rc);
+	if (rc == -1) if (errno == EAGAIN || errno == EWOULDBLOCK) printf("read failed %d \n", rc);
 	return NULL;
 }
 
 static void * master_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = read(fd, buff_slave_rx + start, bytes);
-	if (rc == EAGAIN || rc == EWOULDBLOCK) printf("read failed %d \n", rc);
+	if (rc == -1) if (errno == EAGAIN || errno == EWOULDBLOCK) printf("read failed %d \n", rc);
 	return NULL;
 }
 
 static void * slave_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = write(fd, buff_slave_tx + start, bytes);
-	printf("write return code  %d \n", rc);
+	if (rc == -1) printf("write error return code  %d \n", errno);
 	return NULL;
 }
 
 static void * master_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = write(fd, buff_slave_tx + start, bytes);
-	printf("write return code  %d \n", rc);
+	if (rc == -1) printf("write error return code  %d \n", errno);
 	return NULL;
 }
 static void * master_read_write(void *pfd) {
