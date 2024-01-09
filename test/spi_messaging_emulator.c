@@ -19,14 +19,14 @@ volatile static bool gpio22 = false;
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = read(fd, buff_slave_rx + start, bytes);
-	if (rc == -1) if (errno == EAGAIN || errno == EWOULDBLOCK) printf("read failed %d \n", rc);
+	if (rc == -1) if (errno == EAGAIN || errno == EWOULDBLOCK) printf("read failed %d \n", errno);
 	return NULL;
 }
 
 static void * master_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
 	int rc = read(fd, buff_slave_rx + start, bytes);
-	if (rc == -1) if (errno == EAGAIN || errno == EWOULDBLOCK) printf("read failed %d \n", rc);
+	if (rc == -1) if (errno == EAGAIN || errno == EWOULDBLOCK) printf("read failed %d \n", errno);
 	return NULL;
 }
 
