@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -87,6 +88,7 @@ static void _spi_messaging_test() {
 	pthread_t slave_thr;
 	socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, 0, fd);
 	pthread_create(&master_thr, NULL, master_read_write, (void *)(&(fd[1])));
+	int saved_flags = fcntl(fd[0], F_GETFL);
 	fcntl(fd[0], F_SETFL, saved_flags & ~O_NONBLOCK);
 	pthread_create(&slave_thr, NULL, slave_read_write, (void *)(&(fd[0])));
 	pthread_join(master_thr, NULL);
