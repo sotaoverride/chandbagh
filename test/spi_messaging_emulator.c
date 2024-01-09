@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -17,25 +18,29 @@ volatile static bool gpio22 = false;
 
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	read(fd, buff_slave_rx + start, bytes);
+	int rc = read(fd, buff_slave_rx + start, bytes);
+	if (rc == EAGAIN || rc == EWOULDBLOCK) printf("read failed %d \n", rc);
 	return NULL;
 }
 
 static void * master_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	read(fd, buff_master_rx + start, bytes);
+	int rc = read(fd, buff_slave_rx + start, bytes);
+	if (rc == EAGAIN || rc == EWOULDBLOCK) printf("read failed %d \n", rc);
 	return NULL;
 }
 
 static void * slave_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	write(fd, buff_slave_tx + start, bytes);
+	int rc = write(fd, buff_slave_tx + start, bytes);
+	printf("write return code  %d \n", rc);
 	return NULL;
 }
 
 static void * master_sockpair_write(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
-	write(fd, buff_slave_tx + start, bytes);
+	int rc = write(fd, buff_slave_tx + start, bytes);
+	printf("write return code  %d \n", rc);
 	return NULL;
 }
 static void * master_read_write(void *pfd) {
@@ -63,7 +68,7 @@ static void * slave_read_write(void *pfd) {
 	slave_sockpair_write(pfd, 1, 0);
 	slave_sockpair_read(pfd,1,0);
 	//should read 0xca
-	if buff_slave_rx[0] == 0xca{
+	if (buff_slave_rx[0] == 0xca){
 	printf("0x%x", buff_slave_rx[0]);
 	slave_sockpair_write(pfd, 2, 1);
 	slave_sockpair_read(pfd, 2,1);
