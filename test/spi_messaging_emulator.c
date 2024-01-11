@@ -15,7 +15,7 @@ static unsigned char buff_slave_rx[3] = {0xaa, 0xbb, 0xbb};
 static unsigned char buff_slave_tx[3] = {0xca, 0xd5, 0xd5};
 static unsigned char buff_master_rx[3] =  {0xdd, 0xee, 0xcc};
 static unsigned char buff_master_tx[3] = {0x5a, 0xad, 0xfc};
-volatile static bool gpio22 = false;
+volatile static bool gpio22 = true;
 
 static void * slave_sockpair_read(void *pfd, int bytes, int start) {
 	int fd = *((int *)pfd);
