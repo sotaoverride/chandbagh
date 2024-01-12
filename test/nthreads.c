@@ -2,17 +2,32 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <unistd.h>
 #include "messaging_queue.h"
 
 #define handle_error_en(en, msg) \ do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
 #define handle_error(msg) \ do { perror(msg); exit(EXIT_FAILURE); } while (0)
+int global_number_of_threads;
+/*Create the messaging bus/queue*/
+struct Queue *queue;			// the queue itself
+queue = (struct Queue *) malloc(sizeof(struct Queue));	// allocate the queue
+queue->front = NULL;			// initialize the queue's pointers to NULL
+queue->rear = NULL;
+/*Generate thread number randomly*/
+int genRandoms(int lower, int upper,
+                            int count)
+{
+        int num = (rand() %
+        (upper - lower + 1)) + lower;
+        printf("random number:%d \n", num);
+	return num;
+}
 
 struct thread_info {    /* Used as argument to thread_start() */
     pthread_t thread_id;        /* ID returned by pthread_create() */
     int       thread_num;       /* Application-defined thread # */
     char     *argv_string;      /* From command-line argument */
-    struct Queue* queue_ptr; /*messaing bus/queue pointer*/
 };
 
 /*thread function to enqueue bus*/
@@ -24,7 +39,7 @@ enqueue_bus(void *arg)
 			
 }
 static void *
-deqeue_bus(void *arg){
+dequeue_bus(void *arg){
 	int tmp = dequeue(queue);
 	message_for_id = tmp;
 	return NULL;
@@ -54,19 +69,6 @@ thread_start(void *arg)
 
     return uargv;
 }
-
-/*Generate thread number randomly*/
-int genRandoms(int lower, int upper,
-                            int count)
-{
-        int num = (rand() %
-        (upper - lower + 1)) + lower;
-        printf("random number:%d \n", num);
-	return num;
-}
-/*global to publish thread address for thread a message is addressed to*/
-int message_for_id;
-int global_number_of_thread;
 
 int main(int argc, char *argv[])
 {
