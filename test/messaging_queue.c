@@ -1,6 +1,6 @@
 #include <stdio.h>			
 #include <stdlib.h>				// needed for malloc 
-#include "messaing_queue.h"
+#include "messaging_queue.h"
 
 void enqueue(struct Queue *q, int i)	// this function will create a new node storing i and
 {										// add it to the rear of the queue

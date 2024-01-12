@@ -1,17 +1,12 @@
 //  data structures for the program:
 
-typedef struct component
+struct node				// a node in a linked list
 {
-	int comp_id;
-	int sub;
-}
-typedef struct node				// a node in a linked list
-{
-	int message_for;					// consists of the int item
+	int item;
 	struct node *next;			// and a pointer to the next item in the linked list
 };
 
-typedef struct Queue			// the Queue will have a pointer to the front
+struct Queue			// the Queue will have a pointer to the front
 {								// and a pointer to the rear of the queue
 	struct node *front;			// the pointers will equal NULL if the list is empty
 	struct node *rear;			// or will point at the same location for a 1-item queue

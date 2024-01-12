@@ -6,17 +6,14 @@
 #include <unistd.h>
 #include "messaging_queue.h"
 
-#define handle_error_en(en, msg) \ do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
-#define handle_error(msg) \ do { perror(msg); exit(EXIT_FAILURE); } while (0)
+#define handle_error_en(en, msg) do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
+#define handle_error(msg) do { perror(msg); exit(EXIT_FAILURE); } while (0)
 int global_number_of_threads;
+int message_for_id = 1000;
 /*Create the messaging bus/queue*/
-struct Queue *queue;			// the queue itself
-queue = (struct Queue *) malloc(sizeof(struct Queue));	// allocate the queue
-queue->front = NULL;			// initialize the queue's pointers to NULL
-queue->rear = NULL;
+struct Queue *queue;
 /*Generate thread number randomly*/
-int genRandoms(int lower, int upper,
-                            int count)
+int genRandoms(int lower, int upper)
 {
         int num = (rand() %
         (upper - lower + 1)) + lower;
@@ -34,7 +31,8 @@ struct thread_info {    /* Used as argument to thread_start() */
 static void * 
 enqueue_bus(void *arg)
 {
-	enqueue(queue, &(genRamdom(0, global_number_of_thread));
+	int tmp = genRandoms(0, global_number_of_threads);
+	enqueue(queue, tmp);
 	return NULL;
 			
 }
@@ -78,6 +76,10 @@ int main(int argc, char *argv[])
     ssize_t             stack_size;
     pthread_attr_t      attr;
     struct thread_info  *tinfo;
+    queue = (struct Queue *) malloc(sizeof(struct Queue));	// allocate the queue
+    queue->front = NULL;			// initialize the queue's pointers to NULL
+    queue->rear = NULL;
+
 
     /* The "-s" option specifies a stack size for our threads. */
 
@@ -117,14 +119,14 @@ int main(int argc, char *argv[])
         handle_error("calloc");
 
     /*create one thread that enqueues the queue*/
-    struct thread_info ti;
-    s = pthread_create(ti.thread_id, &attr, &equeue_bus, 100);
+    struct thread_info ti2;
+    s = pthread_create(ti2.thread_id, &attr, &enqueue_bus, 100);
     if (s != 0)
 	    handle_error_en(s, "pthread_create");
     
     /*create one thread that dequeues the queue*/
-    struct thread_info ti;
-    s = pthread_create(ti.thread_id, &attr, &dequeue_bus, 100);
+    struct thread_info ti3;
+    s = pthread_create(ti3.thread_id, &attr, &dequeue_bus, 100);
     if (s != 0)
 	    handle_error_en(s, "pthread_create");
     /*Create the messaging bus/queue*/
