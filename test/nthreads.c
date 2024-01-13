@@ -18,7 +18,7 @@ struct Queue *queue;
 int genRandoms(int lower, int upper)
 {
         int num = (rand() %
-        (upper*2 - lower + 1)) + lower;
+        (upper - lower + 1)) + lower;
         printf("random number:%d \n", num);
 	return num;
 }
@@ -34,7 +34,7 @@ static void *
 enqueue_bus(void *arg)
 {
 	while(1){
-	int tmp = genRandoms(global_number_of_threads, global_number_of_threads*2);
+	int tmp = genRandoms(0, global_number_of_threads);
 	enqueue(queue, tmp);
 	message_for_id = tmp;
 	}
@@ -48,12 +48,11 @@ check_messages(void* arg)
     struct thread_info *tinfo = arg;
     while(1){
 	int tmp = peek(queue);
-    	if (tinfo->thread_num == tmp){
+    	while (tinfo->thread_num != tmp){}
 	
 	    printf("Thread %d found a messages addressed to it from the queue\n", tinfo->thread_num);
             dequeue(queue);
 
-	}
 
     }
 
