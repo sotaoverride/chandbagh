@@ -16,5 +16,6 @@ struct Queue			// the Queue will have a pointer to the front
 
 void enqueue(struct Queue *q, int item);	// enqueue item to the rear of q
 int dequeue(struct Queue *q);				// dequeue and return the first item of q
+int peek(struct Queue *q);				// peek and return the first item of q
 int empty(struct Queue *q);					// checks to see if the queue is empty (returns 0) or not (returns 1)
 

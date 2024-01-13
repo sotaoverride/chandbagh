@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,7 @@
 #include <pthread.h>
 #define handle_error_en(en, msg) do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
 #define handle_error(msg) do { perror(msg); exit(EXIT_FAILURE); } while (0)
+bool clear_to_dequeue = false;
 int global_number_of_threads;
 int message_for_id = 1000;
 /*Create the messaging bus/queue*/
@@ -16,7 +18,7 @@ struct Queue *queue;
 int genRandoms(int lower, int upper)
 {
         int num = (rand() %
-        (upper - lower + 1)) + lower;
+        (upper*2 - lower + 1)) + lower;
         printf("random number:%d \n", num);
 	return num;
 }
@@ -32,19 +34,12 @@ static void *
 enqueue_bus(void *arg)
 {
 	while(1){
-	int tmp = genRandoms(0, global_number_of_threads);
+	int tmp = genRandoms(global_number_of_threads, global_number_of_threads*2);
 	enqueue(queue, tmp);
-	}
-	return NULL;
-			
-}
-static void *
-dequeue_bus(void *arg){
-	while(1) {
-	int tmp = dequeue(queue);
 	message_for_id = tmp;
 	}
 	return NULL;
+			
 }
 /*check incoming messages for each thread*/
 static void *
@@ -52,8 +47,16 @@ check_messages(void* arg)
 {
     struct thread_info *tinfo = arg;
     while(1){
-    	if (tinfo->thread_num == message_for_id)
-	    printf("Thread %d found a messages addressed to it from the queue\n", tinfo->thread_num);	}
+	int tmp = peek(queue);
+    	if (tinfo->thread_num == tmp){
+	
+	    printf("Thread %d found a messages addressed to it from the queue\n", tinfo->thread_num);
+            dequeue(queue);
+
+	}
+
+    }
+
    return NULL;
 }
 
@@ -143,12 +146,6 @@ int main(int argc, char *argv[])
     if (s != 0)
 	    handle_error_en(s, "pthread_create");
     
-    /*create one thread that dequeues the queue*/
-    struct thread_info ti3;
-    ti3.thread_num = num_threads + 2;
-    s = pthread_create(&ti3.thread_id, &attr, &dequeue_bus, &ti3);
-    if (s != 0)
-	    handle_error_en(s, "pthread_create");
     /*Create the messaging bus/queue*/
     struct Queue *q;			// the queue itself
     q = (struct Queue *) malloc(sizeof(struct Queue));	// allocate the queue
@@ -203,12 +200,6 @@ int main(int argc, char *argv[])
 	    handle_error_en(s, "pthread_join");
     printf("Joined with thread %d; returned value was %s\n",
                ti2.thread_num, (char *) res);
-        free(res);
-    s = pthread_join(ti3.thread_id, &res);
-    if (s !=0)
-	    handle_error_en(s, "pthread_join");
-    printf("Joined with thread %d; returned value was %s\n",
-               ti3.thread_num, (char *) res);
         free(res);
     free(tinfo);
     exit(EXIT_SUCCESS);

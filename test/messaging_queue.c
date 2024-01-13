@@ -17,7 +17,15 @@ void enqueue(struct Queue *q, int i)	// this function will create a new node sto
 	q->rear = temp;						// in either case point rear at the newly added item
 
 }
-
+int peek(struct Queue *q)
+{
+	int temp = -999;
+	if(empty(q)!=0)
+	{
+		return q->front->item;
+	}
+	else{ printf("ERROR, queue empty cant PEEK"); return temp;}
+}
 int dequeue(struct Queue *q)			// dequeue the next item and return the int value,
 {										// deallocating the memory for node
 	int temp =-999;						// temp will be the int value, initialize it to -999 in case q is empty
