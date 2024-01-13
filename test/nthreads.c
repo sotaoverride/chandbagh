@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "messaging_queue.h"
-
+#include <pthread.h>
 #define handle_error_en(en, msg) do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
 #define handle_error(msg) do { perror(msg); exit(EXIT_FAILURE); } while (0)
 int global_number_of_threads;
@@ -31,17 +31,35 @@ struct thread_info {    /* Used as argument to thread_start() */
 static void * 
 enqueue_bus(void *arg)
 {
+	while(1){
 	int tmp = genRandoms(0, global_number_of_threads);
 	enqueue(queue, tmp);
+	}
 	return NULL;
 			
 }
 static void *
 dequeue_bus(void *arg){
+	while(1) {
 	int tmp = dequeue(queue);
 	message_for_id = tmp;
+	}
 	return NULL;
 }
+/*check incoming messages for each thread*/
+static void *
+check_messages(void* arg)
+{
+    struct thread_info *tinfo = arg;
+    while(1){
+    	if (tinfo->thread_num == message_for_id)
+	    printf("Thread %d found a messages addressed to it from the queue\n", tinfo->thread_num);	}
+   return NULL;
+}
+
+
+
+
 /* Thread start function: Check if message on head of the queue is for you (this thread)
  * display address near top of our stack,
    and return upper-cased copy of argv_string. */
@@ -51,10 +69,6 @@ thread_start(void *arg)
 {
     struct thread_info *tinfo = arg;
     char *uargv;
-
-    if (tinfo->thread_num == message_for_id)
-	    printf("Thread %d found a messages addressed to it from the queue\n", tinfo->thread_num);
-
     printf("Thread %d: top of stack near %p; argv_string=%s\n",
            tinfo->thread_num, (void *) &tinfo, tinfo->argv_string);
 
@@ -76,6 +90,7 @@ int main(int argc, char *argv[])
     ssize_t             stack_size;
     pthread_attr_t      attr;
     struct thread_info  *tinfo;
+    struct thread_info  *tinfo2;
     queue = (struct Queue *) malloc(sizeof(struct Queue));	// allocate the queue
     queue->front = NULL;			// initialize the queue's pointers to NULL
     queue->rear = NULL;
@@ -117,21 +132,25 @@ int main(int argc, char *argv[])
     tinfo = calloc(num_threads, sizeof(*tinfo));
     if (tinfo == NULL)
         handle_error("calloc");
+    tinfo2 = calloc(num_threads, sizeof(*tinfo));
+    if (tinfo == NULL)
+        handle_error("calloc");
 
     /*create one thread that enqueues the queue*/
     struct thread_info ti2;
-    s = pthread_create(ti2.thread_id, &attr, &enqueue_bus, 100);
+    ti2.thread_num = num_threads + 1;
+    s = pthread_create(&ti2.thread_id, &attr, &enqueue_bus, &ti2);
     if (s != 0)
 	    handle_error_en(s, "pthread_create");
     
     /*create one thread that dequeues the queue*/
     struct thread_info ti3;
-    s = pthread_create(ti3.thread_id, &attr, &dequeue_bus, 100);
+    ti3.thread_num = num_threads + 2;
+    s = pthread_create(&ti3.thread_id, &attr, &dequeue_bus, &ti3);
     if (s != 0)
 	    handle_error_en(s, "pthread_create");
     /*Create the messaging bus/queue*/
     struct Queue *q;			// the queue itself
-    int i;						// an int for the data
     q = (struct Queue *) malloc(sizeof(struct Queue));	// allocate the queue
     q->front = NULL;			// initialize the queue's pointers to NULL
     q->rear = NULL;
@@ -151,6 +170,16 @@ int main(int argc, char *argv[])
             handle_error_en(s, "pthread_create");
     }
 
+    for (size_t tnum = 0; tnum < num_threads; tnum++) {
+        tinfo2[tnum].thread_num = tnum + 1;
+        tinfo2[tnum].argv_string = argv[optind + tnum];
+
+        /*check incoming messages*/
+	s = pthread_create(&tinfo2[tnum].thread_id, &attr,
+                           &check_messages, &tinfo2[tnum]);
+        if (s != 0)
+            handle_error_en(s, "pthread_create");
+    }
     /* Destroy the thread attributes object, since it is no
        longer needed. */
 
@@ -169,7 +198,18 @@ int main(int argc, char *argv[])
                tinfo[tnum].thread_num, (char *) res);
         free(res);      /* Free memory allocated by thread */
     }
-
+    s = pthread_join(ti2.thread_id, &res);
+    if (s !=0)
+	    handle_error_en(s, "pthread_join");
+    printf("Joined with thread %d; returned value was %s\n",
+               ti2.thread_num, (char *) res);
+        free(res);
+    s = pthread_join(ti3.thread_id, &res);
+    if (s !=0)
+	    handle_error_en(s, "pthread_join");
+    printf("Joined with thread %d; returned value was %s\n",
+               ti3.thread_num, (char *) res);
+        free(res);
     free(tinfo);
     exit(EXIT_SUCCESS);
 }
