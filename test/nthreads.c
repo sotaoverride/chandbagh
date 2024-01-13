@@ -19,7 +19,7 @@ int genRandoms(int lower, int upper)
 {
         int num = (rand() %
         (upper - lower + 1)) + lower;
-        printf("random number:%d \n", num);
+//        printf("random number:%d \n", num);
 	return num;
 }
 
@@ -50,8 +50,8 @@ check_messages(void* arg)
 	int tmp = peek(queue);
     	while (tinfo->thread_num != tmp){}
 	
-	    printf("Thread %d found a messages addressed to it from the queue\n", tinfo->thread_num);
-            dequeue(queue);
+	printf("Thread %d found a message addressed to it from the queue\n", tinfo->thread_num);
+        dequeue(queue);
 
 
     }
@@ -144,12 +144,6 @@ int main(int argc, char *argv[])
     s = pthread_create(&ti2.thread_id, &attr, &enqueue_bus, &ti2);
     if (s != 0)
 	    handle_error_en(s, "pthread_create");
-    
-    /*Create the messaging bus/queue*/
-    struct Queue *q;			// the queue itself
-    q = (struct Queue *) malloc(sizeof(struct Queue));	// allocate the queue
-    q->front = NULL;			// initialize the queue's pointers to NULL
-    q->rear = NULL;
 
     /* Create one thread for each command-line argument. */
 
