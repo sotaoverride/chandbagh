@@ -46,12 +46,15 @@ static void *
 check_messages(void* arg)
 {
     struct thread_info *tinfo = arg;
+    int tmp;
     while(1){
-	int tmp = peek(queue);
-    	while (tinfo->thread_num != tmp){}
+	if(empty(queue)!=0){
+	tmp = peek(queue);
+    	while ( tinfo->thread_num != tmp){}
 	
 	printf("Thread %d found a message addressed to it from the queue\n", tinfo->thread_num);
         dequeue(queue);
+	}
 
 
     }
