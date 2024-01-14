@@ -10,10 +10,12 @@
 #define handle_error_en(en, msg) do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
 #define handle_error(msg) do { perror(msg); exit(EXIT_FAILURE); } while (0)
 int global_number_of_threads;
+pthread_mutex_t mutx;
+
 
 /*Create the messaging bus/queue*/
 
-volatile struct Queue *queue;
+struct Queue *queue;
 
 /*Generate thread number randomly*/
 
@@ -38,7 +40,9 @@ enqueue_bus(void *arg)
 {
 	while(1){
 	int tmp = genRandoms(0, global_number_of_threads);
+	pthread_mutex_lock(&mutx);
 	enqueue(queue, tmp);
+	pthread_mutex_unlock(&mutx);
 	}
 	return NULL;
 			
@@ -52,12 +56,16 @@ check_messages(void* arg)
     struct thread_info *tinfo = arg;
     int tmp;
     while(1){
+	pthread_mutex_lock(&mutx);
 	if(empty(queue)!=0){
 	tmp = peek(queue);
+	pthread_mutex_unlock(&mutx);
     	while ( tinfo->thread_num != tmp){}
 	
 	printf("Thread %d found a message addressed to it from the queue\n", tinfo->thread_num);
+	pthread_mutex_lock(&mutx);
         dequeue(queue);
+	pthread_mutex_lock(&mutx);
 	}
 
 
