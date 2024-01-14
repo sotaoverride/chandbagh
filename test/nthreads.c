@@ -112,7 +112,10 @@ int main(int argc, char *argv[])
     queue->front = NULL;			// initialize the queue's pointers to NULL
     queue->rear = NULL;
 
-
+    if (pthread_mutex_init(&mutx, NULL) != 0) { 
+        printf("\n mutex init has failed\n"); 
+        return 1; 
+    } 
     /* The "-s" option specifies a stack size for our threads. */
 
     stack_size = -1;
