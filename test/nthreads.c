@@ -9,12 +9,14 @@
 #include <pthread.h>
 #define handle_error_en(en, msg) do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)
 #define handle_error(msg) do { perror(msg); exit(EXIT_FAILURE); } while (0)
-bool clear_to_dequeue = false;
 int global_number_of_threads;
-int message_for_id = 1000;
+
 /*Create the messaging bus/queue*/
-struct Queue *queue;
+
+volatile struct Queue *queue;
+
 /*Generate thread number randomly*/
+
 int genRandoms(int lower, int upper)
 {
         int num = (rand() %
@@ -23,25 +25,27 @@ int genRandoms(int lower, int upper)
 	return num;
 }
 
-struct thread_info {    /* Used as argument to thread_start() */
+struct thread_info {            /* Used as argument to thread_start() */
     pthread_t thread_id;        /* ID returned by pthread_create() */
     int       thread_num;       /* Application-defined thread # */
     char     *argv_string;      /* From command-line argument */
 };
 
-/*thread function to enqueue bus*/
+/* Enqueue messages thread function. */
+
 static void * 
 enqueue_bus(void *arg)
 {
 	while(1){
 	int tmp = genRandoms(0, global_number_of_threads);
 	enqueue(queue, tmp);
-	message_for_id = tmp;
 	}
 	return NULL;
 			
 }
+
 /*check incoming messages for each thread*/
+
 static void *
 check_messages(void* arg)
 {
@@ -141,7 +145,7 @@ int main(int argc, char *argv[])
     if (tinfo == NULL)
         handle_error("calloc");
 
-    /*create one thread that enqueues the queue*/
+    /* Create one thread that enqueues messages addressed to a thread. */
     struct thread_info ti2;
     ti2.thread_num = num_threads + 1;
     s = pthread_create(&ti2.thread_id, &attr, &enqueue_bus, &ti2);
