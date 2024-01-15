@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
         switch (opt) {
         case 's':
             stack_size = strtoul(optarg, NULL, 0);
+	    printf("%ld: stack size\n", strtoul(optarg, NULL, 0));
             break;
 
         default:
@@ -142,7 +143,7 @@ int main(int argc, char *argv[])
         handle_error_en(s, "pthread_attr_init");
 
     if (stack_size > 0) {
-        s = pthread_attr_setstacksize(&attr, stack_size);
+        s = pthread_attr_setstacksize(&attr, PTHREAD_STACK_MIN*stack_size);
         if (s != 0)
             handle_error_en(s, "pthread_attr_setstacksize");
     }
