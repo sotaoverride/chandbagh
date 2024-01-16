@@ -22,8 +22,8 @@ struct Queue *queue;
 int genRandoms(int lower, int upper)
 {
         int num = (rand() %
-        (upper - lower + 1)) + lower;
-//        printf("random number:%d \n", num);
+        (upper - lower)) + lower;
+        printf("random number:%d \n", num);
 	return num;
 }
 
@@ -38,8 +38,8 @@ struct thread_info {            /* Used as argument to thread_start() */
 static void * 
 enqueue_bus(void *arg)
 {
-	while(1){
-	int tmp = genRandoms(0, global_number_of_threads);
+	for(int i =0; i<10; i++){
+	int tmp = genRandoms(1, global_number_of_threads+1);
 	pthread_mutex_lock(&mutx);
 	enqueue(queue, tmp);
 	pthread_mutex_unlock(&mutx);
@@ -59,13 +59,13 @@ check_messages(void* arg)
 	pthread_mutex_lock(&mutx);
 	if(empty(queue)!=0){
 	tmp = peek(queue);
+    	if ( tinfo->thread_num == tmp){
+        	dequeue(queue);
+	//	printf("Thread %d running and head of queue is %d\n", tinfo->thread_num, tmp);
+		printf("Thread %d found a message addressed to it from the queue\n", tinfo->thread_num);
+	}
 	pthread_mutex_unlock(&mutx);
-    	while ( tinfo->thread_num != tmp){}
 	
-	printf("Thread %d found a message addressed to it from the queue\n", tinfo->thread_num);
-	pthread_mutex_lock(&mutx);
-        dequeue(queue);
-	pthread_mutex_lock(&mutx);
 	}
 
 
@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
     queue = (struct Queue *) malloc(sizeof(struct Queue));	// allocate the queue
     queue->front = NULL;			// initialize the queue's pointers to NULL
     queue->rear = NULL;
+    queue->size = 0;
 
     if (pthread_mutex_init(&mutx, NULL) != 0) { 
         printf("\n mutex init has failed\n"); 
@@ -192,7 +193,7 @@ int main(int argc, char *argv[])
     /* Destroy the thread attributes object, since it is no
        longer needed. */
 
-    s = pthread_attr_destroy(&attr);
+    //s = pthread_attr_destroy(&attr);
     if (s != 0)
         handle_error_en(s, "pthread_attr_destroy");
 
@@ -214,6 +215,7 @@ int main(int argc, char *argv[])
                ti2.thread_num, (char *) res);
         free(res);
     free(tinfo);
+    while(1){}
     exit(EXIT_SUCCESS);
 }
 
