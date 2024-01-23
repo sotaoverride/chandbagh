@@ -1,3 +1,5 @@
+#include <sys/types.h>
+#include <unistd.h>
 #include <assert.h>
 #include <mqueue.h>
 #include <stdio.h>
@@ -11,7 +13,7 @@ int mq_notify(mqd_t mqdes, const struct sigevent *sevp);
 Link with -lrt.
 
 */
-void startprocesses()
+void startprocesses(char* buff, mqd_t* mqd)
 {
 	    struct message {
                 int x;
@@ -34,8 +36,7 @@ void startprocesses()
         msg.z = -1;
 
         /* Sending a struct works identically to a char array */
-	struct message * ptr = &buffer;
-        mq_send (mqd, (const char *)&msg, sizeof (struct message), 10);
+        mq_send (*mqd, (const char *)&msg, sizeof (struct message), 10);
     }
 
  
@@ -43,12 +44,12 @@ void startprocesses()
     else{
         printf("Hello from Parent!\n");
 	  /* When reading, use a char* buffer and explicitly cast */
-        if ((mq_receive (mqd, buffer, attr.mq_msgsize, &priority)) != -1)
+        if ((mq_receive (*mqd, buff, attr.mq_msgsize, &priority)) != -1)
         {
                 /* Retrieve message fields here */
 		printf("Contents of structure %d are %c, %d\n", ptr->x, ptr>y, ptr->z);
 
-		memset( buffer, '\0', attr.mq_msgsize );
+		memset( buff, '\0', attr.mq_msgsize );
         }
     }
 
@@ -73,7 +74,7 @@ int main () {
         /* Retrieve message from the queue and get its priority level */
         unsigned int priority = 0;
 
-	startprocesses();
+	startprocesses(buffer, &mqd);
 	//free (buffer);
 	//buffer = NULL;
 	//mq_close (mqd);
