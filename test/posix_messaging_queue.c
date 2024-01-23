@@ -67,10 +67,10 @@ void startprocesses(char* buff, mqd_t* mqd, struct mq_attr* attr)
 }
 int main () {
 	/* Create and open a message queue for writing and reading*/
-	mqd_t mqd = mq_open ("/OpenCSF_MQ", O_CREAT | O_RDWR,  0600, NULL);
+	mqd_t mqd;
 	int rc = mq_unlink("/OpenCSF_MQ");
-	if (rc == -1) { perror("mq_unlink"); exit(1);}
-	mqd = mq_open ("/OpenCSF_MQ", O_CREAT | O_RDWR,  0600, NULL);
+	if (rc == -1) perror("mq_unlink");
+	mqd = mq_open ("/OpenCSF_MQ", O_CREAT | O_EXCL | O_RDWR,  0600, NULL);
 
 
 
