@@ -39,9 +39,10 @@ void startprocesses(char* buff, mqd_t* mqd, struct mq_attr* attr)
 		msg.z = -1;
 
 		/* Sending a struct works identically to a char array */
-		while(1)
+		while(1){
 			msg.x++;
-		mq_send (*mqd, (const char *)&msg, sizeof (struct message), 10);
+			mq_send (*mqd, (const char *)&msg, sizeof (struct message), 10);
+		}
 	}
 
 
@@ -67,6 +68,11 @@ void startprocesses(char* buff, mqd_t* mqd, struct mq_attr* attr)
 int main () {
 	/* Create and open a message queue for writing and reading*/
 	mqd_t mqd = mq_open ("/OpenCSF_MQ", O_CREAT | O_RDWR,  0600, NULL);
+	int rc = mq_unlink("/OpenCSF_MQ");
+	if (rc == -1) { perror("mq_unlink"); exit(1);}
+	mqd = mq_open ("/OpenCSF_MQ", O_CREAT | O_RDWR,  0600, NULL);
+
+
 
 	/* Ensure the creation was successful */
 	if (mqd == -1)
