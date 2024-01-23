@@ -4,6 +4,7 @@
 #include <mqueue.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 /*
  * SYNOPSIS
 #include <mqueue.h>
@@ -13,7 +14,7 @@ int mq_notify(mqd_t mqdes, const struct sigevent *sevp);
 Link with -lrt.
 
 */
-void startprocesses(char* buff, mqd_t* mqd)
+void startprocesses(char* buff, mqd_t* mqd, struct mq_attr* attr)
 {
 	    struct message {
                 int x;
@@ -23,6 +24,7 @@ void startprocesses(char* buff, mqd_t* mqd)
 
     pid_t p;
     p = fork();
+    unsigned int priority = 0;
     if(p<0)
     {
       perror("fork fail");
@@ -44,12 +46,13 @@ void startprocesses(char* buff, mqd_t* mqd)
     else{
         printf("Hello from Parent!\n");
 	  /* When reading, use a char* buffer and explicitly cast */
-        if ((mq_receive (*mqd, buff, attr.mq_msgsize, &priority)) != -1)
+        if ((mq_receive (*mqd, buff, attr->mq_msgsize, &priority)) != -1)
         {
                 /* Retrieve message fields here */
-		printf("Contents of structure %d are %c, %d\n", ptr->x, ptr>y, ptr->z);
+		struct message* ptr = (struct messaege*) buff;
+		printf("Contents of structure %d are %c, %d\n", ptr->x, ptr->y, ptr->z);
 
-		memset( buff, '\0', attr.mq_msgsize );
+		memset( buff, '\0', attr->mq_msgsize );
         }
     }
 
@@ -71,10 +74,8 @@ int main () {
         char *buffer = calloc (attr.mq_msgsize, 1);
         assert (buffer != NULL);
 
-        /* Retrieve message from the queue and get its priority level */
-        unsigned int priority = 0;
 
-	startprocesses(buffer, &mqd);
+	startprocesses(buffer, &mqd, &attr);
 	//free (buffer);
 	//buffer = NULL;
 	//mq_close (mqd);
