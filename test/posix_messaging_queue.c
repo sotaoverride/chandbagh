@@ -49,7 +49,7 @@ void startprocesses(char* buff, mqd_t* mqd, struct mq_attr* attr)
 		while(1){
 			printf("Hello from Parent!\n");
 			/* When reading, use a char* buffer and explicitly cast */
-			 relen =  ((mq_receive (*mqd, buff, attr->mq_msgsize, &priority)) != -1);
+			 relen =  ((mq_receive (*mqd, buff, attr->mq_msgsize, &priority)));
 			if (relen == -1) perror("mq_receive");
 			else if (relen != sizeof(struct message)) printf ("unexpected length\n");
 			else
@@ -65,7 +65,7 @@ void startprocesses(char* buff, mqd_t* mqd, struct mq_attr* attr)
 }
 int main () {
 	/* Create and open a message queue for writing and reading*/
-	mqd_t mqd = mq_open ("/OpenCSF_MQ", O_CREAT | O_EXCL | O_NONBLOCK | O_RDWR,  0600, NULL);
+	mqd_t mqd = mq_open ("/OpenCSF_MQ", O_CREAT | O_NONBLOCK | O_RDWR,  0600, NULL);
 
 	/* Ensure the creation was successful */
 	if (mqd == -1)
@@ -82,8 +82,8 @@ int main () {
 
 
 	startprocesses(buffer, &mqd, &attr);
-	//free (buffer);
-	//buffer = NULL;
-	//mq_close (mqd);
+	free (buffer);
+	buffer = NULL;
+	mq_close (mqd);
 	return 0;
 }
